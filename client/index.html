@@ -2,9 +2,28 @@
 <html>
   <head>
     <title>Back End Assessment</title>
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body class="container">
+    <div id="button-holder">
     <button id="complimentButton">Get a compliment</button>
+    <button id = "fortuneButton">Eat Fortune Cookie</button>
+    <button id = "motivationButton">Need Motivation?</button>
+    <button id = "pokemonButton">Which pokemon are you?</button>
+  </div>
+  <div id = "poke-img"></div>
+  <form action="submit">
+    <label for="colors">Choose a color:</label>
+
+<select name="colors" id="colors">
+  <option value="Red">Red</option>
+  <option value="Blue">Blue</option>
+  <option value="Green">Green</option>
+  <option value="Orange">Orange</option>
+</select>
+<input value="Find Hex Code" type="submit" id = "submitButton">
+
+</form>
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
@@ -15,6 +34,62 @@
               alert(data);
             });
       };
+      document.getElementById("fortuneButton").onclick = function () {
+        axios.get("http://localhost:4000/api/fortune/")
+            .then(function (response) {
+              const data = response.data;
+              alert(data);
+            });
+      };
+      document.getElementById("motivationButton").onclick = function () {
+        axios.get("http://localhost:4000/api/motivation/")
+            .then(function (response) {
+              const data = response.data;
+              alert(data);
+            });
+      };
+      const pokePic = document.getElementById('poke-img')
+      document.getElementById("pokemonButton").onclick = function () {
+        let rand = Math.floor(Math.random() * 600);
+        axios.get(`https://pokeapi.co/api/v2/pokemon/${rand}`)
+            .then(function (response) {
+              const {name} = response.data
+              const sprite = response.data.sprites.front_default
+              pokePic.style.backgroundImage = 
+              `url('${sprite}')`
+              console.log(sprite)
+              alert(`you are definitely a ${name}`);
+            });
+      };
+
+      const selectForm = document.querySelector('form')
+      const selectInput = document.querySelector('select')
+      const body = document.querySelector('body')
+
+      newText = document.createElement('h1')
+      newText.textContent = 'What Color Will You Choose?'
+      body.appendChild(newText)
+
+      selectForm.addEventListener('submit',(event) => {
+        event.preventDefault()
+        const {value} = selectInput
+        
+        axios.get(`http://localhost:4000/api/colors/${value}`)
+            .then(function (response) {
+              if(body.childElementCount>6){
+                
+                body.removeChild(body.lastElementChild)
+              }
+              const hex = response.data;
+              let newText = document.createElement('h1')
+              newText.textContent = `Good Choice, the hex code for ${value} is ${hex}`
+              newText.style.color =`${hex}`
+              body.appendChild(newText)
+              
+        
+            });
+      })
+      
     </script>
   </body>
 </html>
